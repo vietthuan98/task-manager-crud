@@ -23,34 +23,6 @@ export async function getTask(req, res) {
     }
 }
 
-//task by user profile
-
-export async function createTask(req, res) {
-    try {
-        const { user } = req;
-        const task = new Task({
-            ...req.body,
-            owner: user._id,
-        });
-        await task.save();
-        res.status(200).send(task);
-    } catch (err) {
-        res.status(400).send(err);
-    }
-}
-
-export async function getTasksByUser(req, res) {
-    try {
-        const { user } = req;
-        // c1: const result = await Task.find({ owner: user._id });
-        // c2:
-        await user.populate('tasks').execPopulate();
-        res.status(200).send(user.tasks);
-    } catch (err) {
-        res.status(400).send(err);
-    }
-}
-
 export async function updateTask(req, res) {
     const fields = Object.keys(req.body);
     const isValid = validateUpdateTask(fields);
@@ -82,6 +54,57 @@ export async function deleteTask(req, res) {
         if (!task) {
             return res.status(404).send('Task does not exist.');
         }
+        res.status(200).send(task);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+//task by user profile
+//GET /tasks/profile?completed=true
+export async function getTasksByUser(req, res) {
+    const match = {};
+    const sort = {};
+    const { completed, limit, skip, sortBy } = req.query;
+
+    if (completed) {
+        match.completed = completed === 'true';
+    }
+
+    if (sortBy) {
+        const [field, order] = sortBy.split(':');
+        sort[field] = order === 'asc' ? 1 : -1;
+    }
+
+    try {
+        const { user } = req;
+        // c1: const result = await Task.find({ owner: user._id });
+        // c2:
+        await user
+            .populate({
+                path: 'tasks',
+                match,
+                options: {
+                    limit: +limit,
+                    skip: +skip,
+                    sort,
+                },
+            })
+            .execPopulate();
+        res.status(200).send(user.tasks);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+export async function createTask(req, res) {
+    try {
+        const { user } = req;
+        const task = new Task({
+            ...req.body,
+            owner: user._id,
+        });
+        await task.save();
         res.status(200).send(task);
     } catch (err) {
         res.status(400).send(err);
@@ -126,5 +149,3 @@ export async function deleteTaskByUser(req, res) {
         res.status(400).send(err);
     }
 }
-
-// 6029ed0930b42f1c540ebd4a
