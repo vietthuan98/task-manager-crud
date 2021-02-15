@@ -1,5 +1,6 @@
 import User from './user.model';
 import { validateUpdateUser } from './user.validator';
+import sharp from 'sharp';
 
 export async function getUsers(req, res) {
     try {
@@ -101,6 +102,50 @@ export async function deleteUser(req, res) {
             return res.status(404).send('User does not exist.');
         }
         res.status(200).send(user);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+export async function uploadAvatar(req, res) {
+    try {
+        const { user, file } = req;
+        const avatarBuffer = await sharp(file.buffer)
+            .resize({ width: 250, height: 250 })
+            .png()
+            .toBuffer();
+        user.avatar = avatarBuffer;
+        await user.save();
+        res.status(200).send({ message: 'Avatar uploaded' });
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+export async function handleErrorUploadAvatar(err, req, res, next) {
+    res.status(400).send({ error: err.message });
+}
+
+export async function deleteAvatar(req, res) {
+    try {
+        const { user } = req;
+        user.avatar = undefined;
+        await user.save();
+        res.status(200).send({ message: 'Avatar has been deleted successfully' });
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+export async function getAvatar(req, res) {
+    try {
+        const _id = req.params.id;
+        const user = await User.findById(_id);
+        if (!user || !user.avatar) {
+            return new Error('Avatar does not exist.');
+        }
+        res.set('Content-type', 'image/jpg');
+        res.status(200).send(user.avatar);
     } catch (err) {
         res.status(400).send(err);
     }
