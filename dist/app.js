@@ -1,5 +1,7 @@
 "use strict";
 
+require("@babel/polyfill");
+
 var _express = _interopRequireDefault(require("express"));
 
 require("./db/mongoose");
