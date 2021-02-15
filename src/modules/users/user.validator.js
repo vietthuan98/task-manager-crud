@@ -1,8 +1,5 @@
-export const validateUpdateUser = (data) => {
-  const updates = Object.keys(data);
-  const allowedUpdate = ["name", "email", "password", "age"];
-  const isValidOperation = updates.every((update) =>
-    allowedUpdate.includes(update)
-  );
-  return isValidOperation;
+export const validateUpdateUser = (fields) => {
+    const allowedFields = ['name', 'email', 'password', 'age'];
+    const isValidOperation = fields.every((field) => allowedFields.includes(field));
+    return isValidOperation;
 };

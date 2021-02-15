@@ -1,6 +1,5 @@
-export const validateUpdateTask = (data) => {
-  const updates = Object.keys(data);
-  const allowedUpdates = ["description", "completed"];
-  const isValid = updates.every((update) => allowedUpdates.includes(update));
-  return isValid;
+export const validateUpdateTask = (fields) => {
+    const allowedFields = ['description', 'completed'];
+    const isValid = fields.every((field) => allowedFields.includes(field));
+    return isValid;
 };
