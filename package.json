@@ -4,12 +4,15 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "node src/app.js",
-        "dev": "nodemon --exec babel-node src/app.js"
+        "dev": "nodemon --exec babel-node src/app.js",
+        "clean": "rm -rf build && mkdir build",
+        "build-babel": "babel -d ./build ./src -s",
+        "start": "npm run build && node ./build/index.js"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@babel/preset-env": "^7.12.16",
         "@sendgrid/mail": "^7.4.2",
         "bcryptjs": "^2.4.3",
         "dotenv": "^8.2.0",
@@ -23,7 +26,6 @@
     "devDependencies": {
         "@babel/core": "^7.12.16",
         "@babel/node": "^7.12.16",
-        "@babel/preset-env": "^7.12.16",
         "nodemon": "^2.0.7"
     }
 }
