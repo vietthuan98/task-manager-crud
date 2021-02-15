@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import Task from '../tasks/task.model';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -50,6 +51,12 @@ const userSchema = new mongoose.Schema({
     ],
 });
 
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner',
+});
+
 userSchema.methods.toJSON = function () {
     const user = this;
     const userObject = user.toObject();
@@ -85,6 +92,13 @@ userSchema.pre('save', async function (next) {
         const hashedPassword = await bcrypt.hash(this.password, 8);
         this.password = hashedPassword;
     }
+    next();
+});
+
+//delete user task when user is removed
+userSchema.pre('delete', async function (next) {
+    const user = this;
+    Task.deleteMany({ owner: user._id });
     next();
 });
 
