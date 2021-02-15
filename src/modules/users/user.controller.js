@@ -1,6 +1,7 @@
 import User from './user.model';
 import { validateUpdateUser } from './user.validator';
 import sharp from 'sharp';
+import { sendCancellationEmail } from '../../plugins/email';
 
 export async function getUsers(req, res) {
     try {
@@ -83,17 +84,6 @@ export async function updateUser(req, res) {
         res.status(400).send(err);
     }
 }
-
-export async function deleteProfile(req, res) {
-    try {
-        const { user } = req;
-        await user.remove();
-        res.status(200).send({ message: 'Delete successfully' });
-    } catch (err) {
-        res.status(400).send(err);
-    }
-}
-
 export async function deleteUser(req, res) {
     const { id } = req.params;
     try {
@@ -101,7 +91,19 @@ export async function deleteUser(req, res) {
         if (!user) {
             return res.status(404).send('User does not exist.');
         }
-        res.status(200).send(user);
+        sendCancellationEmail(user.email, user.name);
+        res.status(200).send({ message: 'User has been deleted' });
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+export async function deleteProfile(req, res) {
+    try {
+        const { user } = req;
+        await user.remove();
+        sendCancellationEmail(user.email, user.name);
+        res.status(200).send({ message: 'User has been deleted' });
     } catch (err) {
         res.status(400).send(err);
     }

@@ -1,5 +1,6 @@
 import User from '../users/user.model';
 import jwt from 'jsonwebtoken';
+import { sendWelcomeEmail } from '../../plugins/email';
 
 export async function authenticate(req, res, next) {
     try {
@@ -54,6 +55,7 @@ export async function signUp(req, res) {
     try {
         const user = new User(req.body);
         await user.save();
+        sendWelcomeEmail(user.email, user.name);
         const token = await user.generateAuthToken();
         res.status(200).send({ user, token });
     } catch (err) {

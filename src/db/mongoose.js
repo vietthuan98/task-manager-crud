@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+require('dotenv').config();
+import mongoose from 'mongoose';
 
-mongoose.connect("mongodb://localhost:27017/task-manager-api", {
-  useNewUrlParser: true,
-  useCreateIndex: true,
+mongoose.connect(process.env.MONGO_DB_URL, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
 });
