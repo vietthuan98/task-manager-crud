@@ -4,52 +4,57 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Task from '../tasks/task.model';
 
-const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-        trim: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw { message: 'Email is invalid' };
-            }
+const userSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
         },
-    },
-    age: {
-        type: Number,
-        default: 0,
-        validate(value) {
-            if (value < 0) {
-                throw { message: 'Age must be a positive number.' };
-            }
-        },
-    },
-    password: {
-        type: String,
-        required: true,
-        minlength: 7,
-        trim: true,
-        validate(value) {
-            if (value.includes('password')) {
-                throw { message: 'Password cannot contain "password"' };
-            }
-        },
-    },
-    tokens: [
-        {
-            token: {
-                type: String,
-                required: true,
+        email: {
+            type: String,
+            unique: true,
+            required: true,
+            trim: true,
+            validate(value) {
+                if (!validator.isEmail(value)) {
+                    throw { message: 'Email is invalid' };
+                }
             },
         },
-    ],
-});
+        age: {
+            type: Number,
+            default: 0,
+            validate(value) {
+                if (value < 0) {
+                    throw { message: 'Age must be a positive number.' };
+                }
+            },
+        },
+        password: {
+            type: String,
+            required: true,
+            minlength: 7,
+            trim: true,
+            validate(value) {
+                if (value.includes('password')) {
+                    throw { message: 'Password cannot contain "password"' };
+                }
+            },
+        },
+        tokens: [
+            {
+                token: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
+    },
+    {
+        timestamps: true,
+    }
+);
 
 userSchema.virtual('tasks', {
     ref: 'Task',
